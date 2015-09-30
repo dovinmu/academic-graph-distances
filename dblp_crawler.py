@@ -13,7 +13,8 @@ import requests
 
 BASE_URL = 'http://dblp.uni-trier.de/pers/xc/'
 start = 0
-iters = 4
+#iters = 4
+limiter = 10000
 names = {}
 graph = {}
 
@@ -26,7 +27,8 @@ with open('round_' + str(start)) as f:
             
 processing_nodes = [name for name in names.keys()]
 
-for n in range(start+1,iters+1):
+#for n in range(start+1,iters+1):
+while len(names) < limiter:
     newly_added = []
     i = 0
     for name_url in processing_nodes:
@@ -46,15 +48,16 @@ for n in range(start+1,iters+1):
         print('%d/%d. Added %d more names from author %s' % (i,len(processing_nodes),len(newly_added) - current_length, names[name_url]))
         time.sleep(2)
     
-    with open('round_'+str(n),'w') as f:
-        for author in newly_added:
-            f.write(names[author] + ' ; ' + author + '\n')
-    with open('author_graph_round_'+str(n),'w') as f:
-        for author in graph.keys():
-            s = author + ':'
-            for coauthor in graph[author]:
-                s += coauthor + ','
-            f.write(s + '\n')
+    if len(newly_added) > 0:
+        with open('round_'+str(n),'w') as f:
+            for author in newly_added:
+                f.write(names[author] + ' ; ' + author + '\n')
+        with open('author_graph_round_'+str(n),'w') as f:
+            for author in graph.keys():
+                s = author + ':'
+                for coauthor in graph[author]:
+                    s += coauthor + ','
+                f.write(s + '\n')
     
     print('done with round %d, size of names: %d' % (n,len(names)))
     processing_nodes = [name for name in newly_added]
