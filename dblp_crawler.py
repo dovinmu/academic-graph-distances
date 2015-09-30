@@ -1,3 +1,11 @@
+'''
+Crawls dblp, a bibliography of academic computer science publications with over 1.5 million authors.
+
+Policy on web crawlers:
+http://dblp.uni-trier.de/faq/Am+I+allowed+to+crawl+the+dblp+website.html
+
+'''
+
 import time
 import random
 from bs4 import BeautifulSoup
