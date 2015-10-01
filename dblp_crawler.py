@@ -13,10 +13,11 @@ import requests
 
 BASE_URL = 'http://dblp.uni-trier.de/pers/xc/'
 start = 0
-#iters = 4
-limiter = 10000
+iters = 4
+#limiter = 10000
 names = {}
 graph = {}
+excludes = {'a/al=:et':'et al.'}
 
 with open('round_' + str(start)) as f:
     for line in f:
@@ -27,8 +28,8 @@ with open('round_' + str(start)) as f:
             
 processing_nodes = [name for name in names.keys()]
 
-#for n in range(start+1,iters+1):
-while len(names) < limiter:
+for n in range(start+1,iters+1):
+#while len(names) < limiter:
     newly_added = []
     i = 0
     for name_url in processing_nodes:
@@ -39,11 +40,12 @@ while len(names) < limiter:
         for coauthor in soup.find_all('author'):
             coauthor_url = coauthor.get('urlpt')
             coauthor_name = coauthor.text
-            if coauthor_url not in names:
-                names[coauthor_url] = coauthor_name
-                graph[coauthor_name] = set([author_name])
-                newly_added.append(coauthor_url)
-            graph[author_name].add(coauthor_name)
+            if coauthor_url not in excludes:
+                if coauthor_url not in names:
+                    names[coauthor_url] = coauthor_name
+                    graph[coauthor_name] = set([author_name])
+                    newly_added.append(coauthor_url)
+                graph[author_name].add(coauthor_name)
         i += 1
         print('%d/%d. Added %d more names from author %s' % (i,len(processing_nodes),len(newly_added) - current_length, names[name_url]))
         time.sleep(2)
